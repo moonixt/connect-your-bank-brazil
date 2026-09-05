@@ -1,96 +1,110 @@
 ---
 name: connect-your-bank-brazil
 description: >-
-  Use this when connecting Brazilian banks for free personal Open Finance via
-  Meu Pluggy (own CPF). Agent drives the browser; user only does
-  login/OAuth/2FA. Covers Meu Pluggy, Dashboard connector 200, Demo OAuth (one
-  Item per bank), credentials on disk, and Pluggy API smoke test.
+  Use this when the user wants free personal Open Finance in Brazil via Meu
+  Pluggy. Deliver a detailed setup tutorial in chat (no browser automation).
+  Then help with Pluggy API using Client ID, local secret file, and Item IDs
+  (one per bank).
 ---
 # Connect your Bank (Brazil)
 
-Drive **free personal** Open Finance setup in Brazil via Meu Pluggy + Pluggy API (user’s own CPF only). Not the commercial multi-user plan (~R$ 2.500/mo).
+When the user wants to connect Brazilian banks for **free personal** Open Finance (own CPF) via Meu Pluggy + Pluggy API, **do not drive a browser or assume browser-use / computer-use**. Many agents have no desktop automation.
 
-## How the agent must behave (read first)
+## What you do instead
 
-- **You run the workflow.** Open `meu.pluggy.ai` and `dashboard.pluggy.ai` in the browser; click through menus; copy Item IDs from the Demo UI yourself.
-- **User only does secrets:** passwords, bank consent, 2FA, Meu Pluggy OAuth approve. Hand the desktop over for those; do not ask them to “follow a long checklist.”
-- **One short message at a time.** Say what you’re doing now and what you need from them (one line). Never paste the whole skill as instructions for the user.
-- **Never** ask for Client Secret, passwords, or full email dumps in chat. Secret → local file path the user controls (they paste into an editor/file on the machine). Client ID and Item IDs may be stored in agent memory after you copy them from the UI.
-- **Do not** invent “prepare pluggy.cfg / helper scripts” unless the user asks. Goal is: banks linked + credentials on disk + Item IDs + a successful API smoke test.
-- If Meu Pluggy already has banks but Demo lacks Items, **skip to Demo OAuth** — don’t restart from zero.
+1. Detect the user’s language (default Portuguese if they write in PT).
+2. **Deliver a clear, complete setup tutorial** in chat (structured steps, warnings, what to copy at the end).
+3. After they finish, help with **API usage** (auth, accounts, `/v2/transactions`) using Client ID, local secret file, and Item IDs they provide — still never ask them to paste the Client Secret into chat; a file path is fine.
+4. Stay available for troubleshooting (wrong connector error, missing Item after new bank, 410 on old transactions URL).
 
-## Free vs paid (for the agent)
+Do **not**: open `meu.pluggy.ai` / `dashboard.pluggy.ai` yourself, claim you will log in for them, or invent helper scripts unless they ask.
 
-| Path | Cost | Use |
-|---|---|---|
-| MeuPluggy connector **`200`** | Free, no expiry (per Pluggy) | Personal / own CPF |
-| Direct Nubank/Itaú/etc. in widget | Trial then paid | Commercial multi-user |
+---
 
-Ignore the 15-day trial banner for personal MeuPluggy use. **Never** select live bank brands in Demo for the free path — only **MeuPluggy**.
+## Tutorial to give the user
 
-## Item model (common confusion)
+Paste/adapt the following guide (translate if needed). Keep the warnings intact.
 
-- **1 Item = 1 bank** (institution). Checking + card of that bank share one Item.
-- Two Items ≠ “max 2 apps”; it means two banks. Add more banks the same way.
-- Development apps allow on the order of **~100 Items** (Pluggy FAQ).
-- Do **not** create duplicate Items for the same CPF + same institution (burns Open Finance rate limits).
-- Meu Pluggy Overview shows a bank but API doesn’t → Demo OAuth for that bank not done yet.
+### Overview
 
-## Agent procedure (from zero)
+You will:
 
-### A — Meu Pluggy banks
+1. Connect your banks on **Meu Pluggy** (free consumer portal).
+2. Create a **Pluggy Dashboard** developer app and enable connector **MeuPluggy (id 200)**.
+3. Link each bank in the **Demo** via MeuPluggy OAuth (one **Item ID per bank**).
+4. Save Client ID + Client Secret + Item IDs for API access.
 
-1. Open https://meu.pluggy.ai ; if login wall → hand off to user; continue after.
-2. Open **Conexões** / connect flow. For each bank the user wants: start connect, hand off for bank auth, confirm it appears on Overview.
-3. Tell the user briefly which banks are connected (names + rough balances). Stop inventing banks.
+This is the **personal free** path. Connecting Nubank/Itaú **directly** in the Dashboard widget is the **paid/trial commercial** path — avoid it for personal use.
 
-### B — Dashboard app + MeuPluggy connector
+### Step 1 — Meu Pluggy (banks)
 
-1. Open https://dashboard.pluggy.ai ; login handoff if needed.
-2. Ensure an **Application** exists (Development OK). Create one only if missing.
-3. Enable connector **MeuPluggy (`200`)** in the app’s connector / personalize settings.
-4. Open **Credenciais**. Read/copy **Client ID** yourself. For **Client Secret**: ask user to reveal/copy into a local file (e.g. workspace secret file); you do not paste secret into chat. Confirm the file is non-empty without echoing its contents.
+1. Open https://meu.pluggy.ai  
+2. Sign up or sign in (email or Google/GitHub/Microsoft/Facebook).  
+3. Go to **Conexões** (Connections).  
+4. **Conectar** each bank you want; approve Open Finance in the bank app / site.  
+5. Confirm each bank on **Overview** (ignore marketing “demo” numbers on the marketing landing page before login).
 
-### C — Demo OAuth (once per bank)
+### Step 2 — Dashboard app + credentials
 
-1. **Aplicações → Iniciar Demo / Ir para Demo**.
-2. **Conectar conta** → select **MeuPluggy** only (search “Meu”).
-3. Hand off for OAuth / which Meu Pluggy connection to authorize.
-4. On success, from Demo item menu (⋮) **Copiar Item ID**. Save it labeled with the bank name.
-5. Repeat C for **each** bank on Meu Pluggy until Demo item count matches.
+1. Open https://dashboard.pluggy.ai and sign up / sign in.  
+2. Create an **Application** in **Development** (any name).  
+3. Open the app → **Configurar → Credenciais**.  
+4. Copy **Client ID** and **Client Secret**.  
+   - Store the **Client Secret** in a local file only (e.g. `pluggy-client-secret.txt`). Do not paste it into chat.  
+5. In the app’s connectors / personalize settings, enable **MeuPluggy** (connector **200**).  
+6. You may see a **15-day trial** banner — that is for commercial features. Personal MeuPluggy access is separate and stays free when you use connector 200.
 
-### Wrong-path errors
+### Step 3 — Demo OAuth (Item ID per bank)
 
-- Message like *“Contas de teste só podem conectar conectores sandbox…”* while on Nubank/Itaú → wrong connector. Back out; use **MeuPluggy**.
-- Sales form **Liberar dados reais / Falar com Vendas** → do not fill for personal free path; stay on MeuPluggy Demo OAuth.
-- Sandbox Pluggy Bank (`user-ok` / `password-ok`) is synthetic only — not real balances.
+1. Dashboard → **Aplicações → Iniciar Demo / Ir para Demo**.  
+2. **Conectar conta**.  
+3. Search and select **MeuPluggy** — **not** the bank brand (Nubank, Inter, BB, PicPay, …).  
+4. Authorize; pick the Meu Pluggy connection for that bank if asked.  
+5. When the item appears, open **⋮ → Copiar Item ID**. Save it labeled with the bank name.  
+6. **Repeat steps 2–5 once per bank** connected in Meu Pluggy.
 
-### D — API smoke test
+#### Item rules (read carefully)
 
-Base: `https://api.pluggy.ai`
+| Rule | Detail |
+|---|---|
+| 1 Item = 1 bank | Checking + credit card of the same bank share one Item |
+| Not a “max 2” cap | Two Items means two banks; add more the same way |
+| Dev limit | Development apps allow on the order of ~100 Items |
+| No duplicates | Don’t create multiple Items for the same CPF + same institution (Open Finance rate limits) |
+| API lag | Bank visible on Meu Pluggy Overview but missing in API → Demo OAuth for that bank not done yet |
 
-1. `POST /auth` with `clientId` + `clientSecret` from local secret file → `apiKey` (`X-API-KEY`).
-2. For each Item ID: `GET /accounts?itemId=…` — balances should match Overview.
-3. Transactions: use **`GET /v2/transactions`** with `accountId`, `dateFrom`, `dateTo`, and cursor `next`/`after`. Legacy `GET /transactions` returns **410**.
-4. Amount heuristics: BANK negative ≈ expense; CREDIT positive ≈ purchase. Prefer `description` over flaky categories. Optionally exclude `Same person transfer` and card payments when summarizing spend.
-5. Report success briefly to the user (banks + Item IDs count). Keep secret on disk unless they ask to delete.
+#### If you see this error
 
-## Amounts / spend (optional follow-up)
+> Contas de teste só podem conectar conectores sandbox (Pluggy Bank). Solicite acesso a dados reais…
 
-Only after D works. Pull a month of `/v2/transactions` across accounts, aggregate by description/category, answer in the user’s language. Don’t re-dump setup instructions.
+You selected a **live bank** connector. Go back and choose **MeuPluggy** only.  
+Skip **Liberar dados reais / Falar com Vendas** for the free personal path.  
+Sandbox **Pluggy Bank** (`user-ok` / `password-ok`) is fake data only.
+
+### Step 4 — What you should have
+
+- Client ID  
+- Client Secret in a **local file** (path only if sharing with an agent)  
+- One Item ID per bank  
+
+### Step 5 — API smoke test (agent or user)
+
+Base URL: `https://api.pluggy.ai`
+
+1. `POST /auth` with JSON `{ "clientId", "clientSecret" }` → `apiKey`.  
+2. Header: `X-API-KEY: <apiKey>`.  
+3. `GET /accounts?itemId=<ITEM_ID>` for each Item — balances should match Overview.  
+4. Transactions: **`GET /v2/transactions?accountId=…&dateFrom=YYYY-MM-DD&dateTo=YYYY-MM-DD`** with cursor `next`/`after`.  
+   - Legacy `GET /transactions` returns **410 Gone** — do not use it.  
+5. Amounts (typical): BANK negative ≈ expense; CREDIT positive ≈ purchase. Prefer `description` over flaky categories; optionally exclude `Same person transfer` and card payments when summarizing spend.
+
+### Optional: after setup
+
+Offer to summarize last month’s spending or list balances once credentials + Item IDs exist — without re-sending the whole tutorial unless they ask.
 
 ## Out of scope
 
-- Bacen registration as a recipient
-- Guaranteeing institution coverage or refresh latency
-- Multi-tenant / other people’s banks on the free path
-- Dumping long DIY manuals into chat
-
-## Done when
-
-- [ ] Meu Pluggy shows the intended banks  
-- [ ] MeuPluggy (200) enabled on the Dashboard app  
-- [ ] Client ID known; Client Secret in a local file (not chat)  
-- [ ] One Demo Item ID per bank  
-- [ ] `/auth` + `/accounts` OK for each Item  
-- [ ] `/v2/transactions` works (if spend was requested)
+- Browser/desktop automation for this skill  
+- Bacen registration as a recipient  
+- Multi-tenant / other people’s banks on the free path  
+- Guaranteeing bank coverage or refresh latency

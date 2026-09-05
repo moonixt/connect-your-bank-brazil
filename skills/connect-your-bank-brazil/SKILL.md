@@ -3,7 +3,8 @@ name: connect-your-bank-brazil
 description: >-
   Use this when connecting Brazilian banks for free personal Open Finance via
   Meu Pluggy (own CPF): Meu Pluggy connections, Dashboard app, connector 200,
-  Demo OAuth, Item ID, and Pluggy API accounts/transactions.
+  Demo OAuth (one Item per bank), Item IDs, and Pluggy API
+  accounts/transactions.
 ---
 # Connect your Bank (Brazil)
 
@@ -48,7 +49,22 @@ Do this first. The Dashboard only proxies what already exists in Meu Pluggy.
 1. Dashboard: **Aplicações → Iniciar Demo / Ir para Demo**.
 2. **Conectar conta** → search/select **MeuPluggy** (not the bank brand).
 3. Complete Meu Pluggy OAuth / authorize.
-4. Repeat once per bank connected in Meu Pluggy (one Item per bank, not per account).
+4. Repeat once per bank connected in Meu Pluggy.
+
+### One Item per bank (not a “max 2 apps” cap)
+
+In the Demo, each linked bank shows up as its **own Item** (e.g. MeuPluggy → Nubank, MeuPluggy → PicPay). That is expected.
+
+| Fact | Detail |
+|---|---|
+| **Unit** | **1 Item = 1 bank** (institution), not 1 account |
+| **Same bank** | Checking + credit card from that bank share the **same** Item |
+| **New bank** | Connect in Meu Pluggy, then run Demo OAuth **again** → new Item ID |
+| **Not a 2-bank limit** | Seeing two Items means two banks linked — you can add more (Itaú, Inter, …) the same way |
+| **Dev app ceiling** | Development apps allow on the order of **~100 Items** (Pluggy FAQ) — plenty for personal use |
+| **Do not duplicate** | Avoid creating multiple Items for the **same CPF + same institution** — Open Finance monthly rate limits are shared and duplicates burn them faster |
+
+When Meu Pluggy Overview shows a new bank but the API still only returns the old Item, the Demo OAuth for that bank was not done yet.
 
 ### Common error (wrong connector)
 
@@ -67,10 +83,10 @@ Overview may push **Solicitar acesso à produção / Liberar dados reais** (sale
 ## 4 — Copy Item ID(s)
 
 1. In Demo, open the connected item menu (⋮).
-2. **Copiar Item ID**.
-3. Save each Item ID with the Client ID (secret stays in the local file).
+2. **Copiar Item ID** for **each** bank Item.
+3. Save every Item ID with the Client ID (secret stays in the local file).
 
-You need: `client_id`, `client_secret`, and one or more `item_id`s.
+You need: `client_id`, `client_secret`, and **one `item_id` per bank**.
 
 ## 5 — Call the API
 
@@ -84,7 +100,7 @@ Send later requests with header `X-API-KEY: <apiKey>`.
 
 ### Accounts
 
-`GET /accounts?itemId=<ITEM_ID>`
+`GET /accounts?itemId=<ITEM_ID>` — call once per Item ID when summarizing all banks.
 
 ### Transactions (v2 + cursor)
 
@@ -108,7 +124,7 @@ Pagination: follow response `next` / `after` until empty. See Pluggy docs.
 ## 6 — Sanity check
 
 1. Auth succeeds.
-2. Accounts match Meu Pluggy Overview (balances).
+2. Accounts match Meu Pluggy Overview (balances) for **every** linked bank / Item.
 3. Pull one month via `/v2/transactions` and summarize top categories/descriptions.
 
 ## Security
@@ -128,8 +144,8 @@ Pagination: follow response `next` / `after` until empty. See Pluggy docs.
 - [ ] Banks connected on `meu.pluggy.ai`
 - [ ] Dashboard app with **MeuPluggy (200)** enabled
 - [ ] Client ID + Secret saved locally
-- [ ] Demo OAuth via **MeuPluggy** (not direct bank)
-- [ ] Item ID(s) copied
+- [ ] Demo OAuth via **MeuPluggy** once **per bank** (not direct bank)
+- [ ] Item ID copied for **each** bank
 - [ ] `POST /auth` works
-- [ ] `GET /accounts` matches Overview
+- [ ] `GET /accounts` matches Overview for each Item
 - [ ] `GET /v2/transactions` with `dateFrom`/`dateTo` + cursor works

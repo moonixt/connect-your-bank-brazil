@@ -1,124 +1,107 @@
 ---
 name: connect-your-bank-brazil
 description: >-
-  Use this for free personal Open Finance in Brazil via Meu Pluggy. Default:
-  detailed setup tutorial in chat. If the user asks you to connect for them and
-  you have browser/computer use, drive the flow with handoff only for
-  login/OAuth/2FA. Then help with Pluggy API (one Item per bank).
+  Use this for free personal Open Finance in Brazil via Meu Pluggy. Always start
+  with a detailed setup tutorial in chat. Do not open a browser unless the user
+  explicitly asks you to drive setup. Then help with Pluggy API (one Item per
+  bank).
 ---
 # Connect your Bank (Brazil)
 
-Free **personal** Open Finance in Brazil via Meu Pluggy + Pluggy API (user’s own CPF only). Not the commercial multi-user plan (~R$ 2.500/mo).
+Free **personal** Open Finance in Brazil via Meu Pluggy + Pluggy API (own CPF only). Not the commercial multi-user plan (~R$ 2.500/mo).
 
-## Mode selection (read first)
+## Hard rules (override everything else)
 
-| Situation | What to do |
-|---|---|
-| User asks how to set up / connect banks, or agent has **no** browser/computer use | **Tutorial mode** — deliver the detailed guide below in chat. Do not pretend to open sites. |
-| User explicitly asks you to **do it for them** / “abre aí” / “conecta pra mim” **and** you have browser or computer-use | **Assisted mode** — drive the flow yourself; hand off only for password, bank consent, 2FA, OAuth approve. |
-| User asks you to drive it but you **lack** browser/computer use | Say you can’t automate here, then run **Tutorial mode**. |
+1. **Default = Tutorial mode.** On skill use, your first user-visible action is to deliver the setup tutorial below (user’s language).  
+2. **Do not open a browser, computer-use, or visit** `meu.pluggy.ai` / `dashboard.pluggy.ai` **unless** the user has **explicitly** asked you to drive the setup in this conversation (examples: “conecta você”, “abre aí”, “faz no browser”, “usa o computer use”, “faz pra mim”).  
+3. **Having browser/computer-use available is not permission.** Capability ≠ request.  
+4. If they only say “quero conectar bancos” / “como conecto” / invoke the skill with no “do it for me” wording → **tutorial only**.  
+5. Never paste Client Secret or passwords into chat. Secret stays in a local file; file path OK.
 
-Never dump the whole skill as a wall of meta-instructions. In Tutorial mode, give a clean user-facing guide. In Assisted mode, one short status line at a time.
-
-**Secrets:** never ask for Client Secret / passwords in chat. Secret → local file; user pastes into that file if needed. Client ID and Item IDs may be saved after you or the user copy them from the UI.
+Optional: after the tutorial, one short offer — “Se quiser, eu conduzo no browser (você só faz login/OAuth).” If they decline or ignore, stay on tutorial / API help.
 
 ---
 
-## Tutorial mode (default)
+## Tutorial mode (always start here)
 
-Detect language (Portuguese if they write in PT). Deliver this guide (adapt wording, keep warnings).
+Deliver this guide cleanly in chat (Portuguese if they write in PT). Do not narrate skill meta or mode tables to the user.
 
 ### Overview
 
 1. Connect banks on **Meu Pluggy**.  
 2. Create a **Pluggy Dashboard** app and enable **MeuPluggy (connector 200)**.  
-3. In **Demo**, OAuth via **MeuPluggy** once per bank → copy each **Item ID**.  
-4. Keep Client ID + Client Secret (file) + Item IDs for the API.
+3. In **Demo**, authorize via **MeuPluggy** once per bank → copy each **Item ID**.  
+4. Keep Client ID + Client Secret (local file) + Item IDs for the API.
 
-Avoid connecting Nubank/Itaú **directly** in the widget (paid/trial). Use **MeuPluggy** only for free personal use.
+Do **not** connect Nubank/Itaú/etc. **directly** in the Dashboard widget for personal free use — that is trial/paid. Use **MeuPluggy** only.
 
 ### Step 1 — Meu Pluggy
 
-1. https://meu.pluggy.ai — sign up / sign in.  
-2. **Conexões** → connect each bank; approve Open Finance in the bank.  
-3. Confirm banks on **Overview** (ignore pre-login marketing demo balances).
+1. Open https://meu.pluggy.ai and sign up / sign in.  
+2. Go to **Conexões** and connect each bank; approve Open Finance in the bank.  
+3. Confirm banks on **Overview** (ignore marketing demo balances before login).
 
 ### Step 2 — Dashboard
 
-1. https://dashboard.pluggy.ai — sign up / sign in.  
-2. Create an **Application** (Development OK).  
-3. **Configurar → Credenciais** → copy Client ID and Client Secret (secret only in a local file).  
-4. Enable connector **MeuPluggy (`200`)**.  
-5. A **15-day trial** banner is commercial; personal MeuPluggy stays free via connector 200.
+1. Open https://dashboard.pluggy.ai and sign up / sign in.  
+2. Create an **Application** (Development is fine).  
+3. **Configurar → Credenciais**: copy **Client ID** and **Client Secret** (put the secret only in a local file).  
+4. Enable connector **MeuPluggy (`200`)** in the app.  
+5. A **15-day trial** banner is about commercial features; personal MeuPluggy via 200 stays free.
 
 ### Step 3 — Demo OAuth (one Item per bank)
 
 1. **Aplicações → Iniciar Demo / Ir para Demo**.  
-2. **Conectar conta** → select **MeuPluggy** (not the bank brand).  
-3. Authorize; copy **⋮ → Item ID**; label with the bank name.  
-4. Repeat once per bank on Meu Pluggy.
+2. **Conectar conta** → choose **MeuPluggy** (search “Meu”), **not** the bank brand.  
+3. Authorize; then **⋮ → Copiar Item ID**; label with the bank name.  
+4. Repeat once for **each** bank connected in Meu Pluggy.
 
-**Item rules:** 1 Item = 1 bank (checking + card share it). Not a max-2 cap. Dev ~100 Items. Don’t duplicate same CPF + institution. Overview has bank but API doesn’t → Demo OAuth missing for that bank.
+**Item rules:** 1 Item = 1 bank (checking + card share it). Seeing two Items is two banks — not a max-2 limit. Dev apps ~100 Items. Don’t duplicate the same CPF + institution. Bank on Overview but missing in API → Demo OAuth for that bank still needed.
 
-**Error:** *Contas de teste só podem conectar conectores sandbox…* → you picked a live bank; use **MeuPluggy**. Skip **Liberar dados reais / Falar com Vendas** for personal free path. Sandbox Pluggy Bank is fake data.
+**If you see:** *Contas de teste só podem conectar conectores sandbox…* → you picked a live bank; use **MeuPluggy**. Skip **Liberar dados reais / Falar com Vendas** for personal free use. Sandbox Pluggy Bank is fake data.
 
-### Step 4 — Hand back to the agent
+### Step 4 — Give the agent (when ready)
 
-- Client ID (chat OK)  
-- Client Secret **file path** (not the secret text)  
-- Item ID per bank  
+- Client ID (OK in chat)  
+- Path to the Client Secret file (not the secret text)  
+- One Item ID per bank  
 
-Then the agent can run the API smoke test (below).
-
----
-
-## Assisted mode (browser / computer use only)
-
-Only if the user asked you to perform setup **and** you can operate a browser.
-
-### Behavior
-
-- You click through Meu Pluggy and Dashboard.  
-- Hand desktop to user only for login / bank consent / 2FA / Meu Pluggy OAuth.  
-- Short updates (“Opening Demo…”, “Your turn to authorize PicPay”).  
-- Copy Item IDs from Demo yourself. Confirm secret file non-empty without echoing contents.  
-- Don’t fill sales forms. Don’t select live bank brands in Demo.
-
-### Procedure
-
-**A — Meu Pluggy:** open site → login handoff if needed → connect each requested bank (handoff per bank) → confirm Overview.
-
-**B — Dashboard:** open site → login handoff → ensure Application → enable MeuPluggy 200 → credentials page → user saves Client Secret to local file; you note Client ID.
-
-**C — Demo:** Ir para Demo → Conectar → **MeuPluggy** only → OAuth handoff → copy Item ID → repeat per bank until Demo matches Meu Pluggy.
-
-**D — Smoke test:** run API section below; report banks + Item count briefly.
-
-If Meu Pluggy already has banks, skip to B/C as needed.
+Then ask for an API smoke test or spending summary if they want.
 
 ---
 
-## API smoke test (both modes)
+## Assisted mode (opt-in only)
+
+**Enter only after** an explicit “do it for me / use the browser” request in this chat.
+
+If they asked for assisted mode but you have **no** browser/computer use: say so in one line and keep helping via the tutorial + API.
+
+If you **do** have browser/computer use and they opted in:
+
+- Drive Meu Pluggy + Dashboard yourself.  
+- Hand off only for password, bank consent, 2FA, Meu Pluggy OAuth.  
+- Short status lines only.  
+- Select **MeuPluggy** in Demo only; copy Item IDs yourself.  
+- Confirm secret file is non-empty without printing it.  
+- Do not fill sales forms.  
+- Finish with the API smoke test below.
+
+Procedure sketch: Meu Pluggy banks → Dashboard app + connector 200 + credentials file → Demo OAuth per bank → smoke test.
+
+---
+
+## API smoke test
 
 Base: `https://api.pluggy.ai`
 
-1. `POST /auth` `{ "clientId", "clientSecret" }` → `apiKey` → header `X-API-KEY`.  
+1. `POST /auth` with `clientId` + `clientSecret` → `apiKey` → `X-API-KEY`.  
 2. `GET /accounts?itemId=…` per Item — match Overview.  
-3. Transactions: **`GET /v2/transactions?accountId=&dateFrom=&dateTo=`** + cursor `next`/`after`. Legacy `GET /transactions` → **410**.  
-4. Amounts: BANK negative ≈ expense; CREDIT positive ≈ purchase. Prefer `description`; optionally exclude `Same person transfer` and card payments when summarizing spend.
-
-Optional follow-up: month spending summary once setup works — don’t re-send the full tutorial unless asked.
-
-## Free vs paid (reference)
-
-| Path | Cost |
-|---|---|
-| MeuPluggy connector **200** | Free personal |
-| Direct bank connectors in widget | Trial then paid commercial |
+3. Transactions: **`GET /v2/transactions`** with `accountId`, `dateFrom`, `dateTo`, cursor `next`/`after`. Legacy `GET /transactions` → **410**.  
+4. Amounts: BANK negative ≈ expense; CREDIT positive ≈ purchase. Prefer `description`; optionally skip `Same person transfer` and card payments when summarizing spend.
 
 ## Out of scope
 
-- Claiming browser automation when you don’t have it  
-- Bacen recipient registration  
+- Auto-opening browsers because the tool exists  
 - Other people’s banks on the free path  
+- Bacen recipient registration  
 - Guaranteeing coverage / refresh latency

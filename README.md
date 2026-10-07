@@ -26,4 +26,4 @@ Personal free path — not the commercial multi-user Pluggy plan.
 
 ## License
 
-MIT
+Source-available under the [Artificial Manufactory Subscription License](LICENSE). Anyone can read it; use is allowed for active Artificial Manufactory subscribers while their subscription lasts. For other uses, contact [Artificial Manufactory](https://bot.artificialmanufactory.com).
